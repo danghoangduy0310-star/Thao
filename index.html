@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOLD-GOAL STUDY</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+  font-family:'Segoe UI',Arial,sans-serif;
+  background:linear-gradient(135deg,#ff9abf,#ffb3cc,#ffd6e0,#ffe4ec);
+  background-size:400% 400%;
+  animation:gradientMove 10s ease infinite;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+@keyframes gradientMove{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+.container{
+  max-width:960px;
+  margin:auto;
+  padding:24px 20px;
+}
+
+h1{
+  text-align:center;
+  color:#fff;
+  font-size:2rem;
+  font-weight:800;
+  text-shadow:0 2px 12px rgba(255,80,140,0.4);
+  margin-bottom:24px;
+  letter-spacing:1px;
+}
+
+/* CARD */
+.card{
+  background:rgba(255,255,255,0.75);
+  backdrop-filter:blur(12px);
+  padding:20px;
+  border-radius:20px;
+  margin-bottom:18px;
+  box-shadow:0 8px 32px rgba(255,100,160,0.15);
+  border:1.5px solid rgba(255,200,220,0.6);
+  animation:fadeIn 0.5s ease;
+}
+
+.card h3{
+  color:#d63b7a;
+  margin-bottom:12px;
+  font-size:1rem;
+  font-weight:700;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(15px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+
+@media(max-width:600px){.grid{grid-template-columns:1fr;}}
+
+/* TASK */
+ul{list-style:none;margin-top:8px;}
+
+li{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:6px 0;
+  border-bottom:1px solid #ffd6e0;
+  transition:0.2s;
+}
+
+li:hover{transform:translateX(4px);}
+
+li button.tick{
+  width:28px;height:28px;
+  border-radius:50%;
+  border:none;
+  background:linear-gradient(135deg,#ff8fab,#ff4d88);
+  color:white;
+  cursor:pointer;
+  font-size:13px;
+  flex-shrink:0;
+  box-shadow:0 2px 8px rgba(255,80,140,0.3);
+}
+
+.task-done span{text-decoration:line-through;color:#bbb;}
+
+/* BUTTON */
+button{
+  background:linear-gradient(135deg,#ff8fab,#ff4d88);
+  border:none;
+  padding:9px 16px;
+  border-radius:12px;
+  color:white;
+  cursor:pointer;
+  font-size:14px;
+  font-weight:600;
+  box-shadow:0 3px 12px rgba(255,80,140,0.3);
+  transition:transform 0.15s,box-shadow 0.15s;
+}
+
+button:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(255,80,140,0.4);}
+button:active{transform:scale(0.97);}
+
+input[type=text],input:not([type]){
+  padding:8px 12px;
+  border-radius:10px;
+  border:1.5px solid #ffb3cc;
+  width:100%;
+  margin-bottom:10px;
+  font-size:14px;
+  outline:none;
+  background:rgba(255,255,255,0.9);
+  transition:border 0.2s;
+}
+
+input:focus{border-color:#ff4d88;}
+
+/* STATS */
+.stat-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 0;
+  border-bottom:1px solid #ffd6e0;
+  font-size:14px;
+  color:#555;
+}
+
+.stat-row span{
+  font-weight:700;
+  color:#ff4d88;
+  font-size:16px;
+}
+
+/* MUSIC PLAYER */
+.music-bar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.music-bar button{
+  padding:8px 14px;
+  font-size:13px;
+}
+
+input[type=range]{
+  -webkit-appearance:none;
+  height:6px;
+  border-radius:3px;
+  background:linear-gradient(to right,#ff8fab,#ffd6e0);
+  outline:none;
+  flex:1;
+  min-width:80px;
+  border:none;
+  padding:0;
+  margin:0;
+  cursor:pointer;
+}
+
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:16px;height:16px;
+  border-radius:50%;
+  background:#ff4d88;
+  box-shadow:0 2px 6px rgba(255,80,140,0.4);
+  cursor:pointer;
+}
+
+/* FOCUS MODE */
+.focus-mode .card{display:none;}
+.focus-mode .music-card{display:block!important;}
+
+#focusScreen{
+  display:none;
+  text-align:center;
+  padding:20px 0;
+}
+
+.focus-mode #focusScreen{display:block;}
+
+.circle{
+  position:relative;
+  width:220px;height:220px;
+  margin:auto;
+}
+
+svg{transform:rotate(-90deg);}
+
+.bg{fill:none;stroke:#ffd6e0;stroke-width:14;}
+.progress{
+  fill:none;stroke:#ff4d88;
+  stroke-width:14;
+  stroke-dasharray:565;
+  stroke-dashoffset:0;
+  stroke-linecap:round;
+  transition:stroke-dashoffset 1s linear;
+}
+
+.time{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  font-size:36px;font-weight:800;
+  color:#d63b7a;
+}
+
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px;}
+
+/* MATH */
+.math-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+@media(max-width:600px){.math-grid{grid-template-columns:1fr;}}
+
+.math-item{
+  background:rgba(255,240,246,0.9);
+  border-radius:14px;
+  padding:14px;
+  border:1.5px solid #ffb3cc;
+}
+
+.math-item h4{
+  color:#d63b7a;
+  font-size:13px;
+  margin-bottom:8px;
+  font-weight:700;
+}
+
+.formula{
+  font-family:'Courier New',monospace;
+  font-size:13px;
+  color:#444;
+  line-height:1.8;
+}
+
+.formula .f{
+  background:rgba(255,180,210,0.3);
+  border-radius:6px;
+  padding:3px 8px;
+  display:inline-block;
+  margin:2px 0;
+  width:100%;
+}
+
+/* FLOATING HEART */
+.heart{
+  position:fixed;bottom:-20px;
+  font-size:18px;
+  animation:floatUp 6s linear infinite;
+  pointer-events:none;
+  opacity:0.7;
+}
+
+@keyframes floatUp{
+  from{transform:translateY(0) rotate(0deg);opacity:0.7;}
+  to{transform:translateY(-100vh) rotate(20deg);opacity:0;}
+}
+
+/* TABS */
+.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+
+.tab{
+  padding:6px 14px;
+  border-radius:20px;
+  background:rgba(255,200,220,0.5);
+  color:#d63b7a;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  border:1.5px solid transparent;
+  transition:0.2s;
+}
+
+.tab.active{
+  background:linear-gradient(135deg,#ff8fab,#ff4d88);
+  color:white;
+  border-color:transparent;
+}
+</style>
+</head>
+
+<body>
+<audio id="bgMusic" src="Nhacnen.mp3" loop></audio>
+
+<div class="container">
+<h1>🌸 GOLD-GOAL STUDY 🌸</h1>
+
+<!-- MUSIC PLAYER -->
+<div class="card music-card">
+  <h3>🎵 Nhạc nền</h3>
+  <div class="music-bar">
+    <button onclick="toggleMusic()" id="musicBtn">▶ Phát</button>
+    <button onclick="toggleMute()" id="muteBtn">🔊</button>
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" oninput="setVolume(this.value)">
+    <span id="volLabel" style="font-size:13px;color:#d63b7a;font-weight:700;">50%</span>
+  </div>
+</div>
+
+<!-- GRID TOP -->
+<div class="grid">
+
+  <!-- TASK -->
+  <div class="card">
+    <h3>📌 Nhiệm vụ hôm nay</h3>
+    <input id="taskInput" type="text" placeholder="Nhập nhiệm vụ rồi Enter...">
+    <ul id="taskList"></ul>
+  </div>
+
+  <!-- STATS -->
+  <div class="card">
+    <h3>📊 Thống kê</h3>
+    <div class="stat-row">Thời gian học <span id="studyTime">0</span> phút</div>
+    <div class="stat-row">Mất tập trung <span id="lose">0</span> lần</div>
+    <div class="stat-row">Nhiệm vụ xong <span id="doneCount">0</span></div>
+    <br>
+    <button onclick="resetStats()">🗑 Xóa thống kê</button>
+  </div>
+
+</div>
+
+<!-- POMODORO -->
+<div class="card">
+  <h3>⏳ Pomodoro Timer</h3>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+    <label style="font-size:13px;color:#888;">Thời gian (phút):</label>
+    <input type="text" id="pomInput" value="25" style="width:60px;">
+    <button onclick="applyTime()">Áp dụng</button>
+    <button onclick="start()">▶ Bắt đầu học</button>
+  </div>
+</div>
+
+<!-- FOCUS SCREEN -->
+<div id="focusScreen">
+  <h2 style="color:#d63b7a;margin-bottom:16px;">🌸 Đang tập trung 🌸</h2>
+  <div class="circle">
+    <svg width="220" height="220">
+      <circle cx="110" cy="110" r="90" class="bg"></circle>
+      <circle cx="110" cy="110" r="90" class="progress" id="circle"></circle>
+    </svg>
+    <div class="time" id="time">25:00</div>
+  </div>
+  <div id="flags" style="font-size:20px;margin-top:12px;"></div>
+  <div class="btn-row">
+    <button onclick="start()">▶ Bắt đầu</button>
+    <button onclick="pauseTimer()">⏸ Tạm dừng</button>
+    <button onclick="reset()">🔄 Làm lại</button>
+    <button onclick="loseFocus()">🚩 Mất tập trung</button>
+    <button onclick="home()">🏠 Trang chủ</button>
+  </div>
+</div>
+
+<!-- MATH FORMULAS -->
+<div class="card">
+  <h3>📐 Công thức Toán</h3>
+  <div class="tabs">
+    <div class="tab active" onclick="showMath('dao-ham')">Đạo hàm</div>
+    <div class="tab" onclick="showMath('tich-phan')">Tích phân</div>
+    <div class="tab" onclick="showMath('luong-giac')">Lượng giác</div>
+    <div class="tab" onclick="showMath('gioi-han')">Giới hạn</div>
+  </div>
+
+  <!-- ĐẠO HÀM -->
+  <div id="math-dao-ham" class="math-grid">
+    <div class="math-item">
+      <h4>Quy tắc cơ bản</h4>
+      <div class="formula">
+        <div class="f">(xⁿ)' = n·xⁿ⁻¹</div>
+        <div class="f">(c)' = 0</div>
+        <div class="f">(u+v)' = u' + v'</div>
+        <div class="f">(u·v)' = u'v + uv'</div>
+        <div class="f">(u/v)' = (u'v - uv') / v²</div>
+      </div>
+    </div>
+    <div class="math-item">
+      <h4>Hàm thường gặp</h4>
+      <div class="formula">
+        <div class="f">(eˣ)' = eˣ</div>
+        <div class="f">(ln x)' = 1/x</div>
+        <div class="f">(sin x)' = cos x</div>
+        <div class="f">(cos x)' = -sin x</div>
+        <div class="f">(tan x)' = 1/cos²x</div>
+      </div>
+    </div>
+    <div class="math-item">
+      <h4>Hàm hợp</h4>
+      <div class="formula">
+        <div class="f">[f(g(x))]' = f'(g(x))·g'(x)</div>
+        <div class="f">(√x)' = 1/(2√x)</div>
+        <div class="f">(aˣ)' = aˣ·ln a</div>
+      </div>
+    </div>
+    <div class="math-item">
+      <h4>Ứng dụng</h4>
+      <div class="formula">
+        <div class="f">PTT tại x₀: y-y₀=f'(x₀)(x-x₀)</div>
+        <div class="f">f'(x₀)=0 → cực trị</div>
+        <div class="f">f''(x)>0 → lõm lên</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TÍCH PHÂN -->
+  <div id="math-tich-phan" class="math-grid" style="display:none;">
+    <div class="math-item">
+      <h4>Tích phân cơ bản</h4>
+      <div class="formula">
+        <div class="f">∫xⁿdx = xⁿ⁺¹/(n+1) + C</div>
+        <div class="f">∫1/x dx = ln|x| + C</div>
+        <div class="f">∫eˣdx = eˣ + C</div>
+        <div class="f">∫aˣdx = aˣ/ln(a) + C</div>
+      </div>
+    </div>
+    <div class="math-item">
+      <h4>Lượng giác</h4>
+      <div class="formula">
+        <div class="f">∫sin x dx = -cos x + C</div>
+        <div class="f">∫cos x dx = sin x + C</div>
+        <div class="f">∫1/cos²x dx = tan x + C</div>
+        <div class="f">∫1/sin²x dx = -cot x + C</div>
+      </div>
+    </div>
+    <div class="math-item">
+      <h4>Phương pháp từng phần</h4>
+      <div class="formula">
+        <div class="f">∫u dv = uv - ∫v du</div>
+        <div class="f">Chọn u: LOG-INV-ALG-TRI-EXP</div>
+      </div>
+    </div>
+    <div class="math-item">
+      <h4>Tích phân xác định</h4>
+      <div class="formula">
+        <div class="f">∫ₐᵇf(x)dx = F(b) - F(a)</div>
+        <div class="f">S = ∫ₐᵇ|f(x)|dx (diện tích)</div>
+        <div class="f">∫ₐᵇf = -∫ᵦₐf</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LƯỢNG GIÁC -->
+  <div id="math-luong-giac" class="math-grid" style="display:none;">
+    <div class="math-item">
+      <h4>Hệ thức cơ bản</h4>
+      <div class="formula">
+        <div class="f">sin²x + cos²x = 1</div>
+        <div class="f">tan x = sin x / cos x</div>
+        <div class="f">1 + tan²x = 1/cos²x</div>
+        <div class="f">1 + cot²x = 1/sin²x</div>
+      </div>
+    </div>
+    <div class="math-item">
+      <h4>Cộng góc</h4>
+      <div class="formula">
+        <div class="f">sin(a±b)=sin a·cos b±cos a·sin b</div>
+        <div class="f">cos(a±b)=cos a·cos b∓sin a·sin b</div>
+        <div class="f">tan(a±b)=(tan a±tan b)/(1∓tan a·tan b)</div>
+      </div>
+    </div>
+    <div class="math-item">
+      <h4>Góc nhân đôi</h4>
+      <div class="formula">
+        <div class="f">sin 2a = 2 sin a·cos a</div>
+        <div class="f">cos 2a = cos²a - sin²a</div>
+        <div class="f">cos 2a = 1 - 2sin²a</div>
+        <div class="f">cos 2a = 2cos²a - 1</div>
+      </div>
+    </div>
+    <div class="math-item">
+      <h4>Tích → Tổng</h4>
+      <div class="formula">
+        <div class="f">sin a·cos b = ½[sin(a+b)+sin(a-b)]</div>
+        <div class="f">cos a·cos b = ½[cos(a+b)+cos(a-b)]</div>
+        <div class="f">sin a·sin b = ½[cos(a-b)-cos(a+b)]</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GIỚI HẠN -->
+  <div id="math-gioi-han" class="math-grid" style="display:none;">
+    <div class="math-item">
+      <h4>Giới hạn nổi tiếng</h4>
+      <div class="formula">
+        <div class="f">lim(x→0) sin x/x = 1</div>
+        <div class="f">lim(x→0) (1-cos x)/x² = 1/2</div>
+        <div class="f">lim(x→∞) (1+1/x)ˣ = e</div>
+        <div class="f">lim(x→0) (eˣ-1)/x = 1</div>
+        <div class="f">lim(x→0) ln(1+x)/x = 1</div>
+      </div>
+    </div>
+    <div class="math-item">
+      <h4>Quy tắc L'Hôpital</h4>
+      <div class="formula">
+        <div class="f">Dạng 0/0 hoặc ∞/∞:</div>
+        <div class="f">lim f/g = lim f'/g'</div>
+        <div class="f">(áp dụng khi giới hạn tồn tại)</div>
+      </div>
+    </div>
+    <div class="math-item">
+      <h4>Vô cùng bé tương đương</h4>
+      <div class="formula">
+        <div class="f">sin x ~ x (x→0)</div>
+        <div class="f">tan x ~ x (x→0)</div>
+        <div class="f">1-cos x ~ x²/2 (x→0)</div>
+        <div class="f">ln(1+x) ~ x (x→0)</div>
+        <div class="f">eˣ-1 ~ x (x→0)</div>
+      </div>
+    </div>
+    <div class="math-item">
+      <h4>Liên tục & gián đoạn</h4>
+      <div class="formula">
+        <div class="f">lim(x→a⁻)f = lim(x→a⁺)f = f(a)</div>
+        <div class="f">→ f liên tục tại a</div>
+        <div class="f">Gián đoạn loại 1: giới hạn 1 phía tồn tại</div>
+        <div class="f">Gián đoạn loại 2: còn lại</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<script>
+let total=1500,time=1500,timer,running=false,startTime,paused=false;
+let today=new Date().toDateString();
+let stats=JSON.parse(localStorage.getItem("stats"))||{date:today,study:0,lose:0,done:0};
+if(stats.date!==today){stats={date:today,study:0,lose:0,done:0};localStorage.removeItem("tasks");}
+
+let music=document.getElementById("bgMusic");
+music.volume=0.5;
+let muted=false;
+let musicStarted=false;
+
+document.addEventListener("click",()=>{
+  if(!musicStarted){
+    music.play().catch(()=>{});
+    musicStarted=true;
+    document.getElementById("musicBtn").innerText="⏸ Tạm dừng";
+  }
+},{once:true});
+
+function toggleMusic(){
+  if(music.paused){music.play();document.getElementById("musicBtn").innerText="⏸ Tạm dừng";}
+  else{music.pause();document.getElementById("musicBtn").innerText="▶ Phát";}
+}
+
+function toggleMute(){
+  muted=!muted;
+  music.muted=muted;
+  document.getElementById("muteBtn").innerText=muted?"🔇":"🔊";
+}
+
+function setVolume(v){
+  music.volume=v;
+  document.getElementById("volLabel").innerText=Math.round(v*100)+"%";
+  if(v==0){music.muted=true;document.getElementById("muteBtn").innerText="🔇";}
+  else{music.muted=false;document.getElementById("muteBtn").innerText="🔊";}
+}
+
+function applyTime(){
+  let v=parseInt(document.getElementById("pomInput").value)||25;
+  total=v*60;time=total;update();
+}
+
+function update(){
+  let m=Math.floor(time/60),s=time%60;
+  document.getElementById("time").innerText=(m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+  document.getElementById("circle").style.strokeDashoffset=565*(1-time/total);
+}
+
+function start(){
+  if(running)return;
+  document.body.classList.add("focus-mode");
+  running=true;paused=false;
+  startTime=Date.now();
+  timer=setInterval(()=>{time--;update();if(time<=0)finish();},1000);
+}
+
+function pauseTimer(){
+  if(!running)return;
+  if(!paused){clearInterval(timer);paused=true;running=false;}
+  else{running=true;paused=false;timer=setInterval(()=>{time--;update();if(time<=0)finish();},1000);}
+}
+
+function finish(){
+  clearInterval(timer);running=false;
+  let minutes=Math.floor((Date.now()-startTime)/60000);
+  stats.study+=minutes;save();
+  alert("Hoàn thành! 🌸 +"+minutes+" phút học");
+  home();
+}
+
+function reset(){
+  clearInterval(timer);running=false;paused=false;
+  time=total;update();
+}
+
+function loseFocus(){stats.lose++;renderFlags();save();}
+
+function renderFlags(){
+  document.getElementById("flags").innerText="🚩".repeat(stats.lose);
+}
+
+function home(){
+  clearInterval(timer);
+  if(startTime){let m=Math.floor((Date.now()-startTime)/60000||0);stats.study+=m;}
+  save();running=false;paused=false;
+  document.body.classList.remove("focus-mode");
+  reset();startTime=null;
+}
+
+function resetStats(){
+  if(confirm("Xóa hết thống kê?")){stats={date:today,study:0,lose:0,done:0};save();renderFlags();}
+}
+
+function addTask(text){
+  let li=document.createElement("li");
+  li.innerHTML=`<button class="tick" onclick="done(this)">✔</button><span>${text}</span>`;
+  document.getElementById("taskList").appendChild(li);
+  saveTasks();
+}
+
+function done(btn){
+  let li=btn.parentElement;
+  li.classList.add("task-done");
+  document.getElementById("taskList").appendChild(li);
+  stats.done++;save();saveTasks();
+}
+
+document.getElementById("taskInput").addEventListener("keypress",e=>{
+  if(e.key==="Enter"){let v=e.target.value.trim();if(v){addTask(v);e.target.value="";}}
+});
+
+function saveTasks(){localStorage.setItem("tasks",document.getElementById("taskList").innerHTML);}
+document.getElementById("taskList").innerHTML=localStorage.getItem("tasks")||"";
+
+function save(){
+  localStorage.setItem("stats",JSON.stringify(stats));
+  document.getElementById("studyTime").innerText=stats.study;
+  document.getElementById("lose").innerText=stats.lose;
+  document.getElementById("doneCount").innerText=stats.done||0;
+}
+
+/* MATH TABS */
+function showMath(id){
+  ["dao-ham","tich-phan","luong-giac","gioi-han"].forEach(t=>{
+    document.getElementById("math-"+t).style.display="none";
+  });
+  document.getElementById("math-"+id).style.display="grid";
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  event.target.classList.add("active");
+}
+
+/* FLOAT HEART */
+setInterval(()=>{
+  let h=document.createElement("div");
+  h.className="heart";
+  h.innerText=["💖","🌸","✨","💕"][Math.floor(Math.random()*4)];
+  h.style.left=Math.random()*100+"%";
+  h.style.animationDuration=(4+Math.random()*4)+"s";
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),8000);
+},1200);
+
+update();renderFlags();save();
+</script>
+</body>
+</html>
